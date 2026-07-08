@@ -4,7 +4,7 @@ This script simplifies common `systemctl` interactions by providing shorter alia
 
 ## Installation
 
-You can Just add it to a directory in `$PATH` environment variable, `$HOME/.local/bin/` is recommended
+You can just add it to a directory in `$PATH` environment variable, `$HOME/.local/bin/` is recommended
 
 ## Usage
 
@@ -15,8 +15,8 @@ sys [options] [command] [args]
 ### Options
 
 - `-h`, `--help`    Returns this message
-- `-u`, `--user`    Whather to operate in user-level
-- `-n`, `--now`     Whather to operates now, used with enable/disable operations
+- `-u`, `--user`    Operate at user level
+- `-n`, `--now`     Apply immediately (with enable/disable)
 
 ### Commands
 
@@ -39,7 +39,7 @@ sys st nginx
 sys -n ee docker
 ```
 
-**reload a user service:**
+**Reload a user service:**
 ```bash
 sys -u rd pw-loudcompd
 ```

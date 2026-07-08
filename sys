@@ -29,8 +29,8 @@ ${BOLD}${RED}Usage:${RESET}
 
 ${BOLD}${RED}Options:${RESET}
     ${GREEN}-h,  --help${RESET}            Returns this message
-    ${GREEN}-u,  --user${RESET}            Whather to operate in user-level
-    ${GREEN}-n,  --now${RESET}             Whather to operates now, used with enable/disable operations
+    ${GREEN}-u,  --user${RESET}            Operate at user level
+    ${GREEN}-n,  --now${RESET}             Apply immediately (with enable/disable)
 
 ${BOLD}${RED}Commands:${RESET}
     ${GREEN}st, --st, --start${RESET}      Starts systemd services
