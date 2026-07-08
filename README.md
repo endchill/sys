@@ -20,12 +20,12 @@ sys [options] [command] [args]
 
 ### Commands
 
-- `st`, `--st`, `--start`      Starts systemd services
-- `rt`, `--rt`, `--restart`    Restarts systemd services
-- `rd`, `--rd`, `--reload`     Reloads systemd services
-- `sp`, `--sp`, `--stop`       Stops systemd services
-- `ee`, `--ee`, `--enable`     Enables systemd services
-- `de`, `--de`, `--disable`    Disables systemd services
+- `st`, `--st`, `--start`      Start service(s)
+- `rt`, `--rt`, `--restart`    Restart service(s)
+- `rd`, `--rd`, `--reload`     Reload service(s)
+- `sp`, `--sp`, `--stop`       Stop service(s)
+- `ee`, `--ee`, `--enable`     Enable service(s)
+- `de`, `--de`, `--disable`    Disable service(s)
 
 ### Examples
 

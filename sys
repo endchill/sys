@@ -33,12 +33,12 @@ ${BOLD}${RED}Options:${RESET}
     ${GREEN}-n,  --now${RESET}             Apply immediately (with enable/disable)
 
 ${BOLD}${RED}Commands:${RESET}
-    ${GREEN}st, --st, --start${RESET}      Starts systemd services
-    ${GREEN}rt, --rt, --restart${RESET}    Restarts systemd services
-    ${GREEN}rd, --rd, --reload${RESET}     Reloads systemd services
-    ${GREEN}sp, --sp, --stop${RESET}       Stops systemd services
-    ${GREEN}ee, --ee, --enable${RESET}     Enables systemd services
-    ${GREEN}de, --de, --disable${RESET}    Disables systemd services
+    ${GREEN}st, --st, --start${RESET}      Start service(s)
+    ${GREEN}rt, --rt, --restart${RESET}    Restart service(s)
+    ${GREEN}rd, --rd, --reload${RESET}     Reload service(s)
+    ${GREEN}sp, --sp, --stop${RESET}       Stop service(s)
+    ${GREEN}ee, --ee, --enable${RESET}     Enable service(s)
+    ${GREEN}de, --de, --disable${RESET}    Disable service(s)
 EOF
 )"
 }
