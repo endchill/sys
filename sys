@@ -1,0 +1,216 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+
+name="$(basename "$0")"
+user=false
+now=false
+
+
+if [[ "${CLICOLOR_FORCE:-}" -eq 1 ]] || { [[ "${CLICOLOR:-}" -eq 1 ]] && [[ -t 1 ]] }; then
+    RESET="\033[0m"; BOLD="\033[1m"; RED="\033[31m"; GREEN="\033[32m"; YELLOW="\033[33m"; BLUE="\033[34m"; MAGENTA="\033[35m"; CYAN="\033[36m"
+else
+    RESET=""; BOLD=""; RED=""; GREEN=""; YELLOW=""; BLUE=""; MAGENTA=""; CYAN=""
+fi
+
+
+if [[ -z "${1:-}" ]]; then
+    printf $'You have to specify a command.\n' >&2
+    printf $'Try \'%b%s --help%b\' for more information.\n' >&2 "$RED" "$name" "$RESET"
+    exit 1
+fi
+
+
+function _help() {
+    printf $'%b\n' "$(cat << EOF
+${BOLD}${RED}Usage:${RESET}
+    ${GREEN}${name}${RESET} ${YELLOW}[options] [command] [args]${RESET}
+
+${BOLD}${RED}Options:${RESET}
+    ${GREEN}-h,  --help${RESET}            Returns this message
+    ${GREEN}-u,  --user${RESET}            Whather to operate in user-level
+    ${GREEN}-n,  --now${RESET}             Whather to operates now, used with enable/disable operations
+
+${BOLD}${RED}Commands:${RESET}
+    ${GREEN}st, --st, --start${RESET}      Starts systemd services
+    ${GREEN}rt, --rt, --restart${RESET}    Restarts systemd services
+    ${GREEN}rd, --rd, --reload${RESET}     Reloads systemd services
+    ${GREEN}sp, --sp, --stop${RESET}       Stops systemd services
+    ${GREEN}ee, --ee, --enable${RESET}     Enables systemd services
+    ${GREEN}de, --de, --disable${RESET}    Disables systemd services
+EOF
+)"
+}
+
+
+function _operation() {
+    local current_operation="$1"
+    if [[ -z "${operation:-}" ]]; then
+        operation="$current_operation"
+    else
+        printf 'Operation failed.\n' >&2
+        printf 'You cannot use multiple operation at the same time.\n' >&2
+        printf $'Try \'%b%s --help%b\' for more information.\n' "$RED" "$(basename "$0")" "$RESET" >&2
+        exit 1
+    fi
+}
+
+
+args=$(getopt \
+    --options "hun" \
+    --longoptions "help,user,start,restart,reload,stop,enable,disable,now,st,rt,rd,sp,ee,de" \
+    -n "sys" -- "$@")
+
+
+if [[ "$?" -ne 0 ]]; then
+    printf $'Try \'%b%s --help%b\' for more information.\n' "$RED" "$(basename "$0")" "$RESET" >&2
+    exit 1
+fi
+
+
+eval set -- "$args"
+
+
+while true; do
+    case "$1" in
+        "--user"|"-u")
+            user=true
+            shift
+        ;;
+        "--start"|"--st")
+            _operation "start"
+            shift
+        ;;
+        "--restart"|"--rt")
+            _operation "restart"
+            shift
+        ;;
+        "--reload"|"--rd")
+            _operation "reload"
+            shift
+        ;;
+        "--stop"|"--sp")
+            _operation "stop"
+            shift
+        ;;
+        "--enable"|"--ee")
+            _operation "enable"
+            shift
+        ;;
+        "--disable"|"--de")
+            _operation "disable"
+            shift
+        ;;
+        "--now"|"-n")
+            now=true
+            shift
+        ;;
+        "--help"|"-h")
+            _help
+            exit 0
+        ;;
+        "--")
+            shift
+            break
+        ;;
+    esac
+done
+
+
+if [[ -n "${operation:-}" ]]; then
+    case "$operation" in
+        "start"|"restart"|"reload"|"stop")
+            if [[ "$user" == true ]]; then
+                systemctl --user "$operation" "$@"
+            else
+                sudo systemctl "$operation" "$@"
+            fi
+        ;;
+        "enable")
+            if [[ "$user" == true && "$now" == true ]]; then
+                systemctl --user enable --now "$@"
+            elif [[ "$user" == true ]]; then
+                systemctl --user enable "$@"
+            elif [[ "$now" == true ]]; then
+                sudo systemctl enable --now "$@"
+            else
+                sudo systemctl enable "$@"
+            fi
+        ;;
+        "disable")
+            if [[ "$user" == true && "$now" == true ]]; then
+                systemctl --user disable --now "$@"
+            elif [[ "$user" == true ]]; then
+                systemctl --user disable "$@"
+            elif [[ "$now" == true ]]; then
+                sudo systemctl disable --now "$@"
+            else
+                sudo systemctl disable "$@"
+            fi
+        ;;
+    esac
+else
+    case "$1" in
+        "st")
+            shift
+            if [[ "$user" == true ]]; then
+                systemctl --user start "$@"
+            else
+                sudo systemctl start "$@"
+            fi
+        ;;
+        "rt")
+            shift
+            if [[ "$user" == true ]]; then
+                systemctl --user restart "$@"
+            else
+                sudo systemctl restart "$@"
+            fi
+        ;;
+        "rd")
+            shift
+            if [[ "$user" == true ]]; then
+                systemctl --user reload "$@"
+            else
+                sudo systemctl reload "$@"
+            fi
+        ;;
+        "sp")
+            shift
+            if [[ "$user" == true ]]; then
+                systemctl --user stop "$@"
+            else
+                sudo systemctl stop "$@"
+            fi
+        ;;
+        "ee")
+            shift
+            if [[ "$user" == true && "$now" == true ]]; then
+                systemctl --user enable --now "$@"
+            elif [[ "$user" == true ]]; then
+                systemctl --user enable "$@"
+            elif [[ "$now" == true ]]; then
+                sudo systemctl enable --now "$@"
+            else
+                sudo systemctl enable "$@"
+            fi
+        ;;
+        "de")
+            shift
+            if [[ "$user" == true && "$now" == true ]]; then
+                systemctl --user disable --now "$@"
+            elif [[ "$user" == true ]]; then
+                systemctl --user disable "$@"
+            elif [[ "$now" == true ]]; then
+                sudo systemctl disable --now "$@"
+            else
+                sudo systemctl disable "$@"
+            fi
+        ;;
+        *)
+            printf $'Unknown operation \'%b%s%b\'\n' >&2 "$RED" "$1" "$RESET"
+            exit 1
+        ;;
+    esac
+fi
