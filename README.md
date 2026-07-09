@@ -20,13 +20,14 @@ sys [options] [command] [args]
 
 ### Commands
 
-- `st`, `--st`, `--start`      Start service(s)
-- `rt`, `--rt`, `--restart`    Restart service(s)
-- `rd`, `--rd`, `--reload`     Reload service(s)
-- `sp`, `--sp`, `--stop`       Stop service(s)
-- `ss`, `--ss`, `--status`     Status service(s)
-- `ee`, `--ee`, `--enable`     Enable service(s)
-- `de`, `--de`, `--disable`    Disable service(s)
+- `st`, `--st`, `--start`            Start service(s)
+- `rt`, `--rt`, `--restart`          Restart service(s)
+- `rd`, `--rd`, `--reload`           Reload service(s)
+- `sp`, `--sp`, `--stop`             Stop service(s)
+- `ss`, `--ss`, `--status`           Status service(s)
+- `ee`, `--ee`, `--enable`           Enable service(s)
+- `de`, `--de`, `--disable`          Disable service(s)
+- `dr`, `--dr`, `--daemon-reload`    Daemon reload systemd
 
 ### Examples
 
@@ -43,4 +44,9 @@ sys -n ee docker
 **Reload a user service:**
 ```bash
 sys -u rd pw-loudcompd
+```
+
+**Daemon reload:**
+```bash
+sys rd
 ```

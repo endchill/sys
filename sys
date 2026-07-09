@@ -3,6 +3,9 @@
 set -eu -o pipefail
 
 
+# TODO add daemon-reload
+
+
 name="$(basename "$0")"
 user=false
 now=false
@@ -13,6 +16,9 @@ if [[ "${CLICOLOR_FORCE:-}" -eq 1 ]] || { [[ "${CLICOLOR:-}" -eq 1 ]] && [[ -t 1
 else
     RESET=""; BOLD=""; RED=""; GREEN=""; YELLOW=""; BLUE=""; MAGENTA=""; CYAN=""
 fi
+
+
+[[ "$EUID" -eq 0 ]] && { printf 'Do %bNOT%b run this script as root manually.\n' "$RED" "$RESET" >&2; exit 1; }
 
 
 if [[ -z "${1:-}" ]]; then
@@ -28,18 +34,19 @@ ${BOLD}${RED}Usage:${RESET}
     ${GREEN}${name}${RESET} ${YELLOW}[options] [command] [args]${RESET}
 
 ${BOLD}${RED}Options:${RESET}
-    ${GREEN}-h,  --help${RESET}            Returns this message
-    ${GREEN}-u,  --user${RESET}            Operate at user level
-    ${GREEN}-n,  --now${RESET}             Apply immediately (with enable/disable)
+    ${GREEN}-h,  --help${RESET}                   Returns this message
+    ${GREEN}-u,  --user${RESET}                   Operate at user level
+    ${GREEN}-n,  --now${RESET}                    Apply immediately (with enable/disable)
 
 ${BOLD}${RED}Commands:${RESET}
-    ${GREEN}st, --st, --start${RESET}      Start service(s)
-    ${GREEN}rt, --rt, --restart${RESET}    Restart service(s)
-    ${GREEN}rd, --rd, --reload${RESET}     Reload service(s)
-    ${GREEN}sp, --sp, --stop${RESET}       Stop service(s)
-    ${GREEN}ss, --ss, --status${RESET}     Status service(s)
-    ${GREEN}ee, --ee, --enable${RESET}     Enable service(s)
-    ${GREEN}de, --de, --disable${RESET}    Disable service(s)
+    ${GREEN}st, --st, --start${RESET}             Start service(s)
+    ${GREEN}rt, --rt, --restart${RESET}           Restart service(s)
+    ${GREEN}rd, --rd, --reload${RESET}            Reload service(s)
+    ${GREEN}sp, --sp, --stop${RESET}              Stop service(s)
+    ${GREEN}ss, --ss, --status${RESET}            Status service(s)
+    ${GREEN}ee, --ee, --enable${RESET}            Enable service(s)
+    ${GREEN}de, --de, --disable${RESET}           Disable service(s)
+    ${GREEN}dr, --dr, --daemon-reload${RESET}     Daemon reload systemd
 EOF
 )"
 }
@@ -60,7 +67,7 @@ function _operation() {
 
 args=$(getopt \
     --options "hun" \
-    --longoptions "help,user,start,restart,reload,stop,status,enable,disable,now,st,rt,rd,sp,ss,ee,de" \
+    --longoptions "help,user,now,start,restart,reload,stop,status,enable,disable,daemon-reload,st,rt,rd,sp,ss,ee,de,dr" \
     -n "sys" -- "$@")
 
 
@@ -105,6 +112,10 @@ while true; do
         ;;
         "--disable"|"--de")
             _operation "disable"
+            shift
+        ;;
+        "--daemon-reload"|"--dr")
+            _operation "daemon_reload"
             shift
         ;;
         "--now"|"-n")
@@ -152,6 +163,13 @@ if [[ -n "${operation:-}" ]]; then
                 sudo systemctl disable --now "$@"
             else
                 sudo systemctl disable "$@"
+            fi
+        ;;
+        "daemon_reload")
+            if [[ "$user" == true ]]; then
+                systemctl --user daemon-reload
+            else
+                sudo systemctl daemon-reload
             fi
         ;;
     esac
@@ -219,6 +237,13 @@ else
                 sudo systemctl disable --now "$@"
             else
                 sudo systemctl disable "$@"
+            fi
+        ;;
+        "dr")
+            if [[ "$user" == true ]]; then
+                systemctl --user daemon-reload
+            else
+                sudo systemctl daemon-reload
             fi
         ;;
         *)
