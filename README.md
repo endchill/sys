@@ -24,6 +24,7 @@ sys [options] [command] [args]
 - `rt`, `--rt`, `--restart`    Restart service(s)
 - `rd`, `--rd`, `--reload`     Reload service(s)
 - `sp`, `--sp`, `--stop`       Stop service(s)
+- `ss`, `--ss`, `--status`     Status service(s)
 - `ee`, `--ee`, `--enable`     Enable service(s)
 - `de`, `--de`, `--disable`    Disable service(s)
 

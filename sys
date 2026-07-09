@@ -37,6 +37,7 @@ ${BOLD}${RED}Commands:${RESET}
     ${GREEN}rt, --rt, --restart${RESET}    Restart service(s)
     ${GREEN}rd, --rd, --reload${RESET}     Reload service(s)
     ${GREEN}sp, --sp, --stop${RESET}       Stop service(s)
+    ${GREEN}ss, --ss, --status${RESET}     Status service(s)
     ${GREEN}ee, --ee, --enable${RESET}     Enable service(s)
     ${GREEN}de, --de, --disable${RESET}    Disable service(s)
 EOF
@@ -59,7 +60,7 @@ function _operation() {
 
 args=$(getopt \
     --options "hun" \
-    --longoptions "help,user,start,restart,reload,stop,enable,disable,now,st,rt,rd,sp,ee,de" \
+    --longoptions "help,user,start,restart,reload,stop,status,enable,disable,now,st,rt,rd,sp,ss,ee,de" \
     -n "sys" -- "$@")
 
 
@@ -94,6 +95,10 @@ while true; do
             _operation "stop"
             shift
         ;;
+        "--status"|"--ss")
+            _operation "status"
+            shift
+        ;;
         "--enable"|"--ee")
             _operation "enable"
             shift
@@ -120,7 +125,7 @@ done
 
 if [[ -n "${operation:-}" ]]; then
     case "$operation" in
-        "start"|"restart"|"reload"|"stop")
+        "start"|"restart"|"reload"|"stop"|"status")
             if [[ "$user" == true ]]; then
                 systemctl --user "$operation" "$@"
             else
@@ -182,6 +187,14 @@ else
                 systemctl --user stop "$@"
             else
                 sudo systemctl stop "$@"
+            fi
+        ;;
+        "ss")
+            shift
+            if [[ "$user" == true ]]; then
+                systemctl --user status "$@"
+            else
+                systemctl status "$@"
             fi
         ;;
         "ee")
